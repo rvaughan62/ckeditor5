@@ -59,6 +59,9 @@ import NarrowSidebar from '@ckeditor/ckeditor5-comments/src/annotations/narrowsi
 import WideSidebar from '@ckeditor/ckeditor5-comments/src/annotations/widesidebar';
 import PresenceList from '@ckeditor/ckeditor5-real-time-collaboration/src/presencelist';
 
+import ExportPdf from '@ckeditor/ckeditor5-export-pdf/src/exportpdf';
+import ExportWord from '@ckeditor/ckeditor5-export-word/src/exportword';
+
 import SbpRecommendationBox from './sbp-box';
 import SbpAuthorsNoteBox from './sbp-authors-box';
 import Handlebars from './handlebars';
@@ -128,7 +131,9 @@ ClassicEditor.builtinPlugins = [
 	SbpAuthorsNoteBox,
 	Handlebars,
 	SbpAutoformat,
-	ReactPluginEditing
+	ReactPluginEditing,
+	ExportPdf,
+	ExportWord
 ];
 
 ClassicEditor.colloborationPlugins = [
@@ -316,7 +321,10 @@ ClassicEditor.defaultConfig = {
 			'link',
 			'mediaEmbed',
 			'sbpRecommendationBox',
-			'sbpAuthorsNoteBox'
+			'sbpAuthorsNoteBox',
+			'|',
+			'exportPdf',
+			'exportWord'
 		],
 		shouldNotGroupWhenFull: true
 	},
@@ -344,6 +352,23 @@ ClassicEditor.defaultConfig = {
 			borderColors: customBorderColorPalette,
 			backgroundColors: customBackgroundColorPalette
 		}
+	},
+	exportPdf: {
+		stylesheets: [
+			'EDITOR_STYLES',
+		],
+		fileName: 'my-file.pdf',
+		converterOptions: {
+			format: 'A4',
+			margin_top: '20mm',
+			margin_bottom: '20mm',
+			margin_right: '12mm',
+			margin_left: '12mm',
+			page_orientation: 'portrait'
+		}
+	},
+	exportWord: {
+		fileName: 'my-file.docx'
 	},
 	// This value must be kept in sync with the language defined in webpack.config.js.
 	language: 'en'

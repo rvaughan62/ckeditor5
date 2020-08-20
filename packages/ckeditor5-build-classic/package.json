@@ -42,6 +42,8 @@
     "@ckeditor/ckeditor5-easy-image": "^21.0.0",
     "@ckeditor/ckeditor5-editor-classic": "^21.0.0",
     "@ckeditor/ckeditor5-essentials": "^21.0.0",
+    "@ckeditor/ckeditor5-export-pdf": "^1.0.0",
+    "@ckeditor/ckeditor5-export-word": "0.0.2",
     "@ckeditor/ckeditor5-font": "^21.0.0",
     "@ckeditor/ckeditor5-heading": "^21.0.0",
     "@ckeditor/ckeditor5-highlight": "^21.0.0",
