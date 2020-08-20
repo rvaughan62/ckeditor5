@@ -120,7 +120,7 @@ export default class AutoMediaEmbed extends Plugin {
 		let url = '';
 
 		for ( const node of walker ) {
-			if ( node.item.is( 'textProxy' ) ) {
+			if ( node.item.is( '$textProxy' ) ) {
 				url += node.item.data;
 			}
 		}
@@ -129,11 +129,15 @@ export default class AutoMediaEmbed extends Plugin {
 
 		// If the URL does not match to universal URL regexp, let's skip that.
 		if ( !url.match( URL_REGEXP ) ) {
+			urlRange.detach();
+
 			return;
 		}
 
 		// If the URL represents a media, let's use it.
 		if ( !mediaRegistry.hasMedia( url ) ) {
+			urlRange.detach();
+
 			return;
 		}
 
@@ -141,6 +145,8 @@ export default class AutoMediaEmbed extends Plugin {
 
 		// Do not anything if media element cannot be inserted at the current position (#47).
 		if ( !mediaEmbedCommand.isEnabled ) {
+			urlRange.detach();
+
 			return;
 		}
 
@@ -153,6 +159,7 @@ export default class AutoMediaEmbed extends Plugin {
 				this._timeoutId = null;
 
 				writer.remove( urlRange );
+				urlRange.detach();
 
 				let insertionPosition;
 

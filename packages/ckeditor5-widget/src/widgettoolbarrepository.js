@@ -7,12 +7,17 @@
  * @module widget/widgettoolbarrepository
  */
 
+/* global console */
+
 import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
 import ContextualBalloon from '@ckeditor/ckeditor5-ui/src/panel/balloon/contextualballoon';
 import ToolbarView from '@ckeditor/ckeditor5-ui/src/toolbar/toolbarview';
 import BalloonPanelView from '@ckeditor/ckeditor5-ui/src/panel/balloon/balloonpanelview';
-import { isWidget } from './utils';
-import CKEditorError from '@ckeditor/ckeditor5-utils/src/ckeditorerror';
+import {
+	isWidget,
+	centeredBalloonPositionForLongWidgets
+} from './utils';
+import CKEditorError, { attachLinkToDocumentation } from '@ckeditor/ckeditor5-utils/src/ckeditorerror';
 
 /**
  * Widget toolbar repository plugin. A central point for registering widget toolbars. This plugin handles the whole
@@ -121,6 +126,21 @@ export default class WidgetToolbarRepository extends Plugin {
 	 * @param {String} [options.balloonClassName='ck-toolbar-container'] CSS class for the widget balloon.
 	 */
 	register( toolbarId, { ariaLabel, items, getRelatedElement, balloonClassName = 'ck-toolbar-container' } ) {
+		// Trying to register a toolbar without any item.
+		if ( !items.length ) {
+			/**
+			 * When {@link #register} a new toolbar, you need to provide a non-empty array with
+			 * the items that will be inserted into the toolbar.
+			 *
+			 * @error widget-toolbar-no-items
+			 */
+			console.warn(
+				attachLinkToDocumentation( 'widget-toolbar-no-items: Trying to register a toolbar without items.' ), { toolbarId }
+			);
+
+			return;
+		}
+
 		const editor = this.editor;
 		const t = editor.t;
 		const toolbarView = new ToolbarView( editor.locale );
@@ -272,7 +292,8 @@ function getBalloonPositionData( editor, relatedElement ) {
 			defaultPositions.northArrowSouthEast,
 			defaultPositions.southArrowNorth,
 			defaultPositions.southArrowNorthWest,
-			defaultPositions.southArrowNorthEast
+			defaultPositions.southArrowNorthEast,
+			centeredBalloonPositionForLongWidgets
 		]
 	};
 }

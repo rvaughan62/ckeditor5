@@ -12,9 +12,9 @@
 #
 msgid ""
 msgstr ""
-"Language-Team: Uighur (https://www.transifex.com/ckeditor/teams/11143/ug/)\n"
+"Language-Team: Uyghur (https://www.transifex.com/ckeditor/teams/11143/ug/)\n"
 "Language: ug\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgctxt "Label for the image widget."
 msgid "image widget"
@@ -62,4 +62,24 @@ msgstr "چىقىرىش مەغلۇپ بولدى"
 
 msgctxt "The label used by assistive technologies describing an image toolbar attached to an image widget."
 msgid "Image toolbar"
+msgstr ""
+
+msgctxt "The label used for the dropdown in the image toolbar containing defined resize options"
+msgid "Resize image"
+msgstr ""
+
+msgctxt "The label used for the standalone resize options buttons in the image toolbar"
+msgid "Resize image to %0"
+msgstr ""
+
+msgctxt "The accessibility label of the standalone image resize reset option button in the image toolbar for the screen readers"
+msgid "Resize image to the original size"
+msgstr ""
+
+msgctxt "Default label for the resize option that resets the size of the image."
+msgid "Original"
+msgstr ""
+
+msgctxt "The accessibility label of the image resize dropdown list for the screen readers."
+msgid "Image resize list"
 msgstr ""

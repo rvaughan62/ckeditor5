@@ -59,7 +59,7 @@ export default class MediaRegistry {
 			} );
 
 		/**
-		 * The locale {@link module:utils/locale~Locale} instance.
+		 * The {@link module:utils/locale~Locale} instance.
 		 *
 		 * @member {module:utils/locale~Locale}
 		 */
@@ -221,6 +221,7 @@ class Media {
 	 */
 	getViewElement( writer, options ) {
 		const attributes = {};
+		let viewElement;
 
 		if ( options.renderForEditingView || ( options.renderMediaPreview && this.url && this._previewRenderer ) ) {
 			if ( this.url ) {
@@ -233,20 +234,20 @@ class Media {
 
 			const mediaHtml = this._getPreviewHtml( options );
 
-			return writer.createUIElement( 'div', attributes, function( domDocument ) {
-				const domElement = this.toDomElement( domDocument );
-
+			viewElement = writer.createRawElement( 'div', attributes, function( domElement ) {
 				domElement.innerHTML = mediaHtml;
-
-				return domElement;
 			} );
 		} else {
 			if ( this.url ) {
 				attributes.url = this.url;
 			}
 
-			return writer.createEmptyElement( 'oembed', attributes );
+			viewElement = writer.createEmptyElement( 'oembed', attributes );
 		}
+
+		writer.setCustomProperty( 'media-content', true, viewElement );
+
+		return viewElement;
 	}
 
 	/**

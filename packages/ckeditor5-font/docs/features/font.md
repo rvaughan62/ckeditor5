@@ -47,7 +47,7 @@ ClassicEditor
 
 {@snippet features/custom-font-family-options}
 
-### Accept all font names
+### Accepting all font names
 
 By default, all `font-family` values that are not specified in the `config.fontFamily.options` are stripped. You can enable support for all font names by using the {@link module:font/fontfamily~FontFamilyConfig#supportAllValues `config.fontFamily.supportAllValues`} option.
 
@@ -169,7 +169,7 @@ ClassicEditor
 
 {@snippet features/custom-font-size-numeric-options}
 
-### Accept all font sizes
+### Accepting all font sizes
 
 By default, all `font-size` values that are not specified in the `config.fontSize.options` are stripped. You can enable support for all font sizes by using the {@link module:font/fontfamily~FontFamilyConfig#supportAllValues `config.fontSize.supportAllValues`} option.
 
@@ -486,4 +486,4 @@ The {@link module:font/fontbackgroundcolor~FontBackgroundColor} plugin registers
 
 ## Contribute
 
-The source code of the feature is available on GitHub in https://github.com/ckeditor/ckeditor5-font.
+The source code of the feature is available on GitHub in https://github.com/ckeditor/ckeditor5/tree/master/packages/ckeditor5-font.

@@ -7,7 +7,7 @@
  * @module table/converters/upcasttable
  */
 
-import { createEmptyTableCell } from '../commands/utils';
+import { createEmptyTableCell } from '../utils/common';
 
 /**
  * View table element to model table element conversion helper.
@@ -52,11 +52,11 @@ export default function upcastTable() {
 			conversionApi.writer.insert( table, splitResult.position );
 			conversionApi.consumable.consume( viewTable, { name: true } );
 
-			if ( rows.length ) {
-				// Upcast table rows in proper order (heading rows first).
-				rows.forEach( row => conversionApi.convertItem( row, conversionApi.writer.createPositionAt( table, 'end' ) ) );
-			} else {
-				// Create one row and one table cell for empty table.
+			// Upcast table rows in proper order (heading rows first).
+			rows.forEach( row => conversionApi.convertItem( row, conversionApi.writer.createPositionAt( table, 'end' ) ) );
+
+			// Create one row and one table cell for empty table.
+			if ( table.isEmpty ) {
 				const row = conversionApi.writer.createElement( 'tableRow' );
 				conversionApi.writer.insert( row, conversionApi.writer.createPositionAt( table, 'end' ) );
 
@@ -87,6 +87,27 @@ export default function upcastTable() {
 				data.modelCursor = data.modelRange.end;
 			}
 		} );
+	};
+}
+
+/**
+ * Conversion helper that skips empty <tr> from upcasting at the beginning of the table.
+ *
+ * Empty row is considered a table model error but when handling clipboard data there could be rows that contain only row-spanned cells
+ * and empty TR-s are used to maintain table structure (also {@link module:table/tablewalker~TableWalker} assumes that there are only rows
+ * that have related tableRow elements).
+ *
+ * *Note:* Only first empty rows are removed because those have no meaning and solves issue of improper table with all empty rows.
+ *
+ * @returns {Function} Conversion helper.
+ */
+export function skipEmptyTableRow() {
+	return dispatcher => {
+		dispatcher.on( 'element:tr', ( evt, data ) => {
+			if ( data.viewItem.isEmpty && data.modelCursor.index == 0 ) {
+				evt.stop();
+			}
+		}, { priority: 'high' } );
 	};
 }
 

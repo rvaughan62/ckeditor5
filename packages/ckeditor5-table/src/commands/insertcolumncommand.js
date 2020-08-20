@@ -8,7 +8,7 @@
  */
 
 import Command from '@ckeditor/ckeditor5-core/src/command';
-import { findAncestor } from './utils';
+import { getColumnIndexes, getSelectionAffectedTableCells } from '../utils/selection';
 
 /**
  * The insert column command.
@@ -53,7 +53,7 @@ export default class InsertColumnCommand extends Command {
 	refresh() {
 		const selection = this.editor.model.document.selection;
 
-		const tableParent = findAncestor( 'table', selection.getFirstPosition() );
+		const tableParent = selection.getFirstPosition().findAncestor( 'table' );
 
 		this.isEnabled = !!tableParent;
 	}
@@ -72,13 +72,11 @@ export default class InsertColumnCommand extends Command {
 		const tableUtils = editor.plugins.get( 'TableUtils' );
 		const insertBefore = this.order === 'left';
 
-		const referencePosition = insertBefore ? selection.getFirstPosition() : selection.getLastPosition();
-		const referenceRange = insertBefore ? selection.getFirstRange() : selection.getLastRange();
+		const affectedTableCells = getSelectionAffectedTableCells( selection );
+		const columnIndexes = getColumnIndexes( affectedTableCells );
 
-		const tableCell = referenceRange.getContainedElement() || findAncestor( 'tableCell', referencePosition );
-		const table = tableCell.parent.parent;
-
-		const { column } = tableUtils.getCellLocation( tableCell );
+		const column = insertBefore ? columnIndexes.first : columnIndexes.last;
+		const table = affectedTableCells[ 0 ].findAncestor( 'table' );
 
 		tableUtils.insertColumns( table, { columns: 1, at: insertBefore ? column : column + 1 } );
 	}

@@ -3,20 +3,11 @@
  * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
  */
 
-import {
-	downcastInsertCell,
-	downcastInsertRow,
-	downcastInsertTable,
-	downcastRemoveRow,
-	downcastTableHeadingColumnsChange,
-	downcastTableHeadingRowsChange
-} from '../../src/converters/downcast';
-import upcastTable, { upcastTableCell } from '../../src/converters/upcasttable';
 import { assertEqualMarkup } from '@ckeditor/ckeditor5-utils/tests/_utils/utils';
 import { setData } from '@ckeditor/ckeditor5-engine/src/dev-utils/model';
+import TableWalker from '../../src/tablewalker';
 
 const WIDGET_TABLE_CELL_CLASS = 'ck-editor__editable ck-editor__nested-editable';
-const BORDER_REG_EXP = /[\s\S]+/;
 
 /**
  * Returns a model representation of a table shorthand notation:
@@ -177,85 +168,6 @@ export function viewTable( tableData, attributes = {} ) {
 	const widgetHandler = '<div class="ck ck-widget__selection-handle"></div>';
 
 	return `<figure ${ figureAttributes }>${ asWidget ? widgetHandler : '' }<table>${ thead }${ tbody }</table></figure>`;
-}
-
-export function defaultSchema( schema, registerParagraph = true ) {
-	schema.register( 'table', {
-		allowWhere: '$block',
-		allowAttributes: [ 'headingRows', 'headingColumns' ],
-		isLimit: true,
-		isObject: true,
-		isBlock: true
-	} );
-
-	schema.register( 'tableRow', {
-		allowIn: 'table',
-		isLimit: true
-	} );
-
-	schema.register( 'tableCell', {
-		allowIn: 'tableRow',
-		allowAttributes: [ 'colspan', 'rowspan' ],
-		isObject: true
-	} );
-
-	// Allow all $block content inside table cell.
-	schema.extend( '$block', { allowIn: 'tableCell' } );
-
-	// Disallow table in table.
-	schema.addChildCheck( ( context, childDefinition ) => {
-		if ( childDefinition.name == 'table' && Array.from( context.getNames() ).includes( 'table' ) ) {
-			return false;
-		}
-	} );
-
-	if ( registerParagraph ) {
-		schema.register( 'paragraph', { inheritAllFrom: '$block' } );
-	}
-
-	// Styles
-	schema.extend( 'tableCell', {
-		allowAttributes: [ 'border' ]
-	} );
-}
-
-export function defaultConversion( conversion, asWidget = false ) {
-	conversion.elementToElement( { model: 'paragraph', view: 'p' } );
-
-	// Table conversion.
-	conversion.for( 'upcast' ).add( upcastTable() );
-	conversion.for( 'downcast' ).add( downcastInsertTable( { asWidget } ) );
-
-	// Table row conversion.
-	conversion.for( 'upcast' ).elementToElement( { model: 'tableRow', view: 'tr' } );
-	conversion.for( 'downcast' ).add( downcastInsertRow( { asWidget } ) );
-	conversion.for( 'downcast' ).add( downcastRemoveRow( { asWidget } ) );
-
-	// Table cell conversion.
-	conversion.for( 'upcast' ).add( upcastTableCell( 'td' ) );
-	conversion.for( 'upcast' ).add( upcastTableCell( 'th' ) );
-	conversion.for( 'downcast' ).add( downcastInsertCell( { asWidget } ) );
-
-	// Table attributes conversion.
-	conversion.attributeToAttribute( { model: 'colspan', view: 'colspan' } );
-	conversion.attributeToAttribute( { model: 'rowspan', view: 'rowspan' } );
-
-	conversion.for( 'downcast' ).add( downcastTableHeadingColumnsChange( { asWidget } ) );
-	conversion.for( 'downcast' ).add( downcastTableHeadingRowsChange( { asWidget } ) );
-
-	// Styles
-	conversion.for( 'upcast' ).attributeToAttribute( {
-		view: {
-			name: 'td',
-			styles: {
-				border: BORDER_REG_EXP
-			}
-		},
-		model: {
-			key: 'border',
-			value: viewElement => viewElement.getStyle( 'border' )
-		}
-	} );
 }
 
 /**
@@ -419,10 +331,10 @@ function formatAttributes( attributes ) {
 	let attributesString = '';
 
 	if ( attributes ) {
-		const entries = Object.entries( attributes );
+		const sortedKeys = Object.keys( attributes ).sort();
 
-		if ( entries.length ) {
-			attributesString = ' ' + entries.map( entry => `${ entry[ 0 ] }="${ entry[ 1 ] }"` ).join( ' ' );
+		if ( sortedKeys.length ) {
+			attributesString = ' ' + sortedKeys.map( key => `${ key }="${ attributes[ key ] }"` ).join( ' ' );
 		}
 	}
 
@@ -455,17 +367,24 @@ function makeRows( tableData, options ) {
 					delete tableCellData.isSelected;
 				}
 
-				const attributes = isObject ? tableCellData : {};
+				let attributes = {};
 
 				if ( asWidget ) {
 					attributes.class = getClassToSet( attributes );
 					attributes.contenteditable = 'true';
 				}
 
+				if ( isObject ) {
+					attributes = {
+						...attributes,
+						...tableCellData
+					};
+				}
+
 				if ( !( contents.replace( '[', '' ).replace( ']', '' ).startsWith( '<' ) ) && enforceWrapping ) {
 					contents =
 						`<${ wrappingElement == 'span' ? 'span style="display:inline-block"' : wrappingElement }>` +
-							contents +
+						contents +
 						`</${ wrappingElement }>`;
 				}
 
@@ -487,4 +406,146 @@ function getClassToSet( attributes ) {
 		.split( ' ' )
 		.sort()
 		.join( ' ' );
+}
+
+/**
+ * Returns ascii-art visualization of the table.
+ *
+ * @param {module:engine/model/model~Model} model The editor model.
+ * @param {module:engine/model/element~Element} table The table model element.
+ * @returns {String}
+ */
+export function createTableAsciiArt( model, table ) {
+	const tableMap = [ ...new TableWalker( table, { includeAllSlots: true } ) ];
+
+	if ( !tableMap.length ) {
+		return '';
+	}
+
+	const { row: lastRow, column: lastColumn } = tableMap[ tableMap.length - 1 ];
+	const columns = lastColumn + 1;
+
+	const headingRows = parseInt( table.getAttribute( 'headingRows' ) ) || 0;
+	const headingColumns = parseInt( table.getAttribute( 'headingColumns' ) ) || 0;
+
+	let result = '';
+
+	for ( let row = 0; row <= lastRow; row++ ) {
+		let gridLine = '';
+		let contentLine = '';
+
+		for ( let column = 0; column <= lastColumn; column++ ) {
+			const cellInfo = tableMap[ row * columns + column ];
+
+			const isColSpan = cellInfo.cellAnchorColumn != cellInfo.column;
+			const isRowSpan = cellInfo.cellAnchorRow != cellInfo.row;
+
+			gridLine += !isColSpan || !isRowSpan ? '+' : ' ';
+			gridLine += !isRowSpan ? '----' : '    ';
+
+			let contents = getElementPlainText( model, cellInfo.cell ).substring( 0, 2 );
+			contents += ' '.repeat( 2 - contents.length );
+
+			contentLine += !isColSpan ? '|' : ' ';
+			contentLine += !isColSpan && !isRowSpan ? ` ${ contents } ` : '    ';
+
+			if ( column == lastColumn ) {
+				gridLine += '+';
+				contentLine += '|';
+
+				if ( headingRows && row == headingRows ) {
+					gridLine += ' <-- heading rows';
+				}
+			}
+		}
+		result += gridLine + '\n';
+		result += contentLine + '\n';
+
+		if ( row == lastRow ) {
+			result += `+${ '----+'.repeat( columns ) }`;
+
+			if ( headingRows && row == headingRows - 1 ) {
+				result += ' <-- heading rows';
+			}
+
+			if ( headingColumns > 0 ) {
+				result += `\n${ '     '.repeat( headingColumns ) }^-- heading columns`;
+			}
+		}
+	}
+
+	return result;
+}
+
+/**
+ * Generates input data for `modelTable` helper method.
+ *
+ * @param {module:engine/model/model~Model} model The editor model.
+ * @param {module:engine/model/element~Element} table The table model element.
+ * @returns {Array.<Array.<String|Object>>}
+ */
+export function prepareModelTableInput( model, table ) {
+	const result = [];
+	let row = [];
+
+	for ( const cellInfo of new TableWalker( table, { includeAllSlots: true } ) ) {
+		if ( cellInfo.column == 0 && cellInfo.row > 0 ) {
+			result.push( row );
+			row = [];
+		}
+
+		if ( !cellInfo.isAnchor ) {
+			continue;
+		}
+
+		const contents = getElementPlainText( model, cellInfo.cell );
+
+		if ( cellInfo.cellWidth > 1 || cellInfo.cellHeight > 1 ) {
+			row.push( {
+				contents,
+				...( cellInfo.cellWidth > 1 ? { colspan: cellInfo.cellWidth } : null ),
+				...( cellInfo.cellHeight > 1 ? { rowspan: cellInfo.cellHeight } : null )
+			} );
+		} else {
+			row.push( contents );
+		}
+	}
+
+	result.push( row );
+
+	return result;
+}
+
+/**
+ * Pretty formats `modelTable` input data.
+ *
+ * @param {Array.<Array.<String|Object>>} data
+ * @returns {String}
+ */
+export function prettyFormatModelTableInput( data ) {
+	const rowsStringified = data.map( row => {
+		const cellsStringified = row.map( cell => {
+			if ( typeof cell == 'string' ) {
+				return `'${ cell }'`;
+			}
+
+			const fieldsStringified = Object.entries( cell ).map( ( [ key, value ] ) => {
+				return `${ key }: ${ typeof value == 'string' ? `'${ value }'` : value }`;
+			} );
+
+			return `{ ${ fieldsStringified.join( ', ' ) } }`;
+		} );
+
+		return '\t[ ' + cellsStringified.join( ', ' ) + ' ]';
+	} );
+
+	return `[\n${ rowsStringified.join( ',\n' ) }\n]`;
+}
+
+// Returns all the text content from element.
+function getElementPlainText( model, element ) {
+	return [ ...model.createRangeIn( element ).getWalker() ]
+		.filter( ( { type } ) => type == 'text' )
+		.map( ( { item: { data } } ) => data )
+		.join( '' );
 }

@@ -5,13 +5,17 @@ category: features
 
 {@snippet features/build-select-all-source}
 
-The {@link module:select-all/selectall~SelectAll} feature allows selecting the entire content of the editor using the <kbd>Ctrl/⌘</kbd>+<kbd>A</kbd> keystroke or a toolbar button.
+The {@link module:select-all/selectall~SelectAll} feature allows selecting the entire content of the WYSIWYG editor using the <kbd>Ctrl/⌘</kbd>+<kbd>A</kbd> keystroke or the toolbar button.
 
 ## Demo
 
-Press <kbd>Ctrl/⌘</kbd>+<kbd>A</kbd> or use the toolbar button to select the entire content of the editor. Note that when editing an image caption, the selection will only expand to the boundaries of the caption.
+Press <kbd>Ctrl/⌘</kbd>+<kbd>A</kbd> or use the toolbar button to select the entire content of the editor.
 
 {@snippet features/select-all}
+
+<info-box>
+	When the selection is inside the {@link features/image#image-captions image caption}, it will only expand to the boundaries of the caption. Use the keystroke or the toolbar button again to include more content until the entire content of the editor is selected. The same rule applies, for instance, when the selection is inside a table cell or any self–contained (nested) editable region in the content.
+</info-box>
 
 ## Installation
 
@@ -21,7 +25,7 @@ Press <kbd>Ctrl/⌘</kbd>+<kbd>A</kbd> or use the toolbar button to select the e
 
 To add this feature to your editor, install the [`@ckeditor/ckeditor5-select-all`](https://www.npmjs.com/package/@ckeditor/ckeditor5-select-all) package:
 
-```bash
+```
 npm install --save @ckeditor/ckeditor5-select-all
 ```
 
@@ -59,4 +63,4 @@ editor.execute( 'selectAll' );
 
 ## Contribute
 
-The source code of the feature is available on GitHub in https://github.com/ckeditor/ckeditor5-select-all.
+The source code of the feature is available on GitHub in https://github.com/ckeditor/ckeditor5/tree/master/packages/ckeditor5-select-all.

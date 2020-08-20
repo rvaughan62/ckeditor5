@@ -1,6 +1,6 @@
 {
   "name": "@ckeditor/ckeditor5-watchdog",
-  "version": "19.0.0",
+  "version": "21.0.0",
   "description": "A watchdog feature for CKEditor 5 editors. It keeps a CKEditor 5 editor instance running.",
   "keywords": [
     "ckeditor",
@@ -9,23 +9,17 @@
     "ckeditor5-lib"
   ],
   "dependencies": {
-    "lodash-es": "^4.17.10"
+    "lodash-es": "^4.17.15"
   },
   "devDependencies": {
-    "@ckeditor/ckeditor5-core": "^19.0.0",
-    "@ckeditor/ckeditor5-editor-classic": "^19.0.0",
-    "@ckeditor/ckeditor5-engine": "^19.0.0",
-    "@ckeditor/ckeditor5-paragraph": "^19.0.0",
-    "@ckeditor/ckeditor5-utils": "^19.0.0",
-    "eslint": "^5.5.0",
-    "eslint-config-ckeditor5": "^2.0.0",
-    "husky": "^2.4.1",
-    "lint-staged": "^8.2.1",
-    "stylelint-config-ckeditor5": "^1.0.0",
-    "stylelint": "^11.1.1"
+    "@ckeditor/ckeditor5-core": "^21.0.0",
+    "@ckeditor/ckeditor5-editor-classic": "^21.0.0",
+    "@ckeditor/ckeditor5-engine": "^21.0.0",
+    "@ckeditor/ckeditor5-paragraph": "^21.0.0",
+    "@ckeditor/ckeditor5-utils": "^21.0.0"
   },
   "engines": {
-    "node": ">=8.0.0",
+    "node": ">=12.0.0",
     "npm": ">=5.7.1"
   },
   "author": "CKSource (http://cksource.com/)",
@@ -34,32 +28,12 @@
   "bugs": "https://github.com/ckeditor/ckeditor5/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ckeditor/ckeditor5-watchdog.git"
+    "url": "https://github.com/ckeditor/ckeditor5.git",
+    "directory": "packages/ckeditor5-watchdog"
   },
   "files": [
     "lang",
     "src",
     "theme"
-  ],
-  "scripts": {
-    "lint": "eslint --quiet '**/*.js'",
-    "stylelint": "stylelint --quiet --allow-empty-input 'theme/**/*.css' 'docs/**/*.css'"
-  },
-  "lint-staged": {
-    "**/*.js": [
-      "eslint --quiet"
-    ],
-    "**/*.css": [
-      "stylelint --quiet --allow-empty-input"
-    ]
-  },
-  "eslintIgnore": [
-    "src/lib/**",
-    "packages/**"
-  ],
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  }
+  ]
 }

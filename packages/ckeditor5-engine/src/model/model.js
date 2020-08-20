@@ -370,13 +370,28 @@ export default class Model {
 	 *			editor.model.insertContent( writer.createText( 'x' ), writer.createPositionAt( doc.getRoot(), 2 ) );
 	 *		} );
 	 *
-	 * If an instance of {@link module:engine/model/selection~Selection} is passed as `selectable`
-	 * it will be moved to the target position (where the document selection should be moved after the insertion).
+	 * If you want the document selection to be moved to the inserted content, use the
+	 * {@link module:engine/model/writer~Writer#setSelection `setSelection()`} method of the writer after inserting
+	 * the content:
 	 *
 	 *		editor.model.change( writer => {
-	 *			// Insert text replacing the given selection instance.
+	 *			const paragraph = writer.createElement( 'paragraph' );
+	 *
+	 *			// Insert an empty paragraph at the beginning of the root.
+	 *			editor.model.insertContent( paragraph, writer.createPositionAt( editor.model.document.getRoot(), 0 ) );
+	 *
+	 *			// Move the document selection to the inserted paragraph.
+	 *			writer.setSelection( paragraph, 'in' );
+	 *		} );
+	 *
+	 * If an instance of the {@link module:engine/model/selection~Selection model selection} is passed as `selectable`,
+	 * the new content will be inserted at the passed selection (instead of document selection):
+	 *
+	 *		editor.model.change( writer => {
+	 *			// Create a selection in a paragraph that will be used as a place of insertion.
 	 *			const selection = writer.createSelection( paragraph, 'in' );
 	 *
+	 *			// Insert the new text at the created selection.
 	 *			editor.model.insertContent( writer.createText( 'x' ), selection );
 	 *
 	 *			// insertContent() modifies the passed selection instance so it can be used to set the document selection.
@@ -536,26 +551,29 @@ export default class Model {
 	 * @param {module:engine/model/range~Range|module:engine/model/element~Element} rangeOrElement Range or element to check.
 	 * @param {Object} [options]
 	 * @param {Boolean} [options.ignoreWhitespaces] Whether text node with whitespaces only should be considered empty.
+	 * @param {Boolean} [options.ignoreMarkers] Whether markers should be ignored.
 	 * @returns {Boolean}
 	 */
-	hasContent( rangeOrElement, options ) {
+	hasContent( rangeOrElement, options = {} ) {
 		const range = rangeOrElement instanceof ModelElement ? ModelRange._createIn( rangeOrElement ) : rangeOrElement;
 
 		if ( range.isCollapsed ) {
 			return false;
 		}
 
+		const { ignoreWhitespaces = false, ignoreMarkers = false } = options;
+
 		// Check if there are any markers which affects data in this given range.
-		for ( const intersectingMarker of this.markers.getMarkersIntersectingRange( range ) ) {
-			if ( intersectingMarker.affectsData ) {
-				return true;
+		if ( !ignoreMarkers ) {
+			for ( const intersectingMarker of this.markers.getMarkersIntersectingRange( range ) ) {
+				if ( intersectingMarker.affectsData ) {
+					return true;
+				}
 			}
 		}
 
-		const { ignoreWhitespaces = false } = options || {};
-
 		for ( const item of range.getItems() ) {
-			if ( item.is( 'textProxy' ) ) {
+			if ( item.is( '$textProxy' ) ) {
 				if ( !ignoreWhitespaces ) {
 					return true;
 				} else if ( item.data.search( /\S/ ) !== -1 ) {

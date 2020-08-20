@@ -614,7 +614,7 @@ function getBalloonPanelPositions( preferredPosition ) {
 	};
 
 	// Returns only the last position if it was matched to prevent the panel from jumping after the first match.
-	if ( positions.hasOwnProperty( preferredPosition ) ) {
+	if ( Object.prototype.hasOwnProperty.call( positions, preferredPosition ) ) {
 		return [
 			positions[ preferredPosition ]
 		];
@@ -716,7 +716,7 @@ function hasExistingMention( position ) {
 
 	const nodeBefore = position.nodeBefore;
 
-	return hasMention || nodeBefore && nodeBefore.is( 'text' ) && nodeBefore.hasAttribute( 'mention' );
+	return hasMention || nodeBefore && nodeBefore.is( '$text' ) && nodeBefore.hasAttribute( 'mention' );
 }
 
 // Checks if string is a valid mention marker.

@@ -4,13 +4,15 @@
  */
 
 import ModelTestEditor from '@ckeditor/ckeditor5-core/tests/_utils/modeltesteditor';
+import Paragraph from '@ckeditor/ckeditor5-paragraph/src/paragraph';
 import { getData, setData } from '@ckeditor/ckeditor5-engine/src/dev-utils/model';
+import { assertEqualMarkup } from '@ckeditor/ckeditor5-utils/tests/_utils/utils';
+
+import TableEditing from '../../src/tableediting';
+import TableSelection from '../../src/tableselection';
+import { modelTable } from '../_utils/utils';
 
 import RemoveColumnCommand from '../../src/commands/removecolumncommand';
-import TableSelection from '../../src/tableselection';
-import { defaultConversion, defaultSchema, modelTable } from '../_utils/utils';
-import TableUtils from '../../src/tableutils';
-import { assertEqualMarkup } from '@ckeditor/ckeditor5-utils/tests/_utils/utils';
 
 describe( 'RemoveColumnCommand', () => {
 	let editor, model, command;
@@ -18,15 +20,12 @@ describe( 'RemoveColumnCommand', () => {
 	beforeEach( () => {
 		return ModelTestEditor
 			.create( {
-				plugins: [ TableUtils, TableSelection ]
+				plugins: [ Paragraph, TableEditing, TableSelection ]
 			} )
 			.then( newEditor => {
 				editor = newEditor;
 				model = editor.model;
 				command = new RemoveColumnCommand( editor );
-
-				defaultSchema( model.schema );
-				defaultConversion( editor.conversion );
 			} );
 	} );
 
@@ -52,7 +51,7 @@ describe( 'RemoveColumnCommand', () => {
 
 			const tableSelection = editor.plugins.get( TableSelection );
 			const modelRoot = model.document.getRoot();
-			tableSelection._setCellSelection(
+			tableSelection.setCellSelection(
 				modelRoot.getNodeByPath( [ 0, 0, 0 ] ),
 				modelRoot.getNodeByPath( [ 0, 0, 1 ] )
 			);
@@ -78,7 +77,7 @@ describe( 'RemoveColumnCommand', () => {
 
 			const tableSelection = editor.plugins.get( TableSelection );
 			const modelRoot = model.document.getRoot();
-			tableSelection._setCellSelection(
+			tableSelection.setCellSelection(
 				modelRoot.getNodeByPath( [ 0, 0, 0 ] ),
 				modelRoot.getNodeByPath( [ 0, 0, 2 ] )
 			);
@@ -93,7 +92,7 @@ describe( 'RemoveColumnCommand', () => {
 
 			const tableSelection = editor.plugins.get( TableSelection );
 			const modelRoot = model.document.getRoot();
-			tableSelection._setCellSelection(
+			tableSelection.setCellSelection(
 				modelRoot.getNodeByPath( [ 0, 0, 0 ] ),
 				modelRoot.getNodeByPath( [ 0, 0, 12 ] )
 			);
@@ -152,7 +151,7 @@ describe( 'RemoveColumnCommand', () => {
 
 				const tableSelection = editor.plugins.get( TableSelection );
 				const modelRoot = model.document.getRoot();
-				tableSelection._setCellSelection(
+				tableSelection.setCellSelection(
 					modelRoot.getNodeByPath( [ 0, 1, 0 ] ),
 					modelRoot.getNodeByPath( [ 0, 2, 0 ] )
 				);
@@ -177,7 +176,7 @@ describe( 'RemoveColumnCommand', () => {
 
 				const tableSelection = editor.plugins.get( TableSelection );
 				const modelRoot = model.document.getRoot();
-				tableSelection._setCellSelection(
+				tableSelection.setCellSelection(
 					modelRoot.getNodeByPath( [ 0, 1, 1 ] ),
 					modelRoot.getNodeByPath( [ 0, 2, 1 ] )
 				);
@@ -202,7 +201,7 @@ describe( 'RemoveColumnCommand', () => {
 
 				const tableSelection = editor.plugins.get( TableSelection );
 				const modelRoot = model.document.getRoot();
-				tableSelection._setCellSelection(
+				tableSelection.setCellSelection(
 					modelRoot.getNodeByPath( [ 0, 1, 1 ] ),
 					modelRoot.getNodeByPath( [ 0, 2, 1 ] )
 				);
@@ -227,7 +226,7 @@ describe( 'RemoveColumnCommand', () => {
 
 				const tableSelection = editor.plugins.get( TableSelection );
 				const modelRoot = model.document.getRoot();
-				tableSelection._setCellSelection(
+				tableSelection.setCellSelection(
 					modelRoot.getNodeByPath( [ 0, 1, 0 ] ),
 					modelRoot.getNodeByPath( [ 0, 1, 1 ] )
 				);
@@ -252,7 +251,7 @@ describe( 'RemoveColumnCommand', () => {
 
 				const tableSelection = editor.plugins.get( TableSelection );
 				const modelRoot = model.document.getRoot();
-				tableSelection._setCellSelection(
+				tableSelection.setCellSelection(
 					modelRoot.getNodeByPath( [ 0, 1, 1 ] ),
 					modelRoot.getNodeByPath( [ 0, 2, 2 ] )
 				);
@@ -277,7 +276,7 @@ describe( 'RemoveColumnCommand', () => {
 
 				const tableSelection = editor.plugins.get( TableSelection );
 				const modelRoot = model.document.getRoot();
-				tableSelection._setCellSelection(
+				tableSelection.setCellSelection(
 					modelRoot.getNodeByPath( [ 0, 2, 2 ] ),
 					modelRoot.getNodeByPath( [ 0, 1, 1 ] )
 				);
@@ -303,7 +302,7 @@ describe( 'RemoveColumnCommand', () => {
 
 				const tableSelection = editor.plugins.get( TableSelection );
 				const modelRoot = model.document.getRoot();
-				tableSelection._setCellSelection(
+				tableSelection.setCellSelection(
 					modelRoot.getNodeByPath( [ 0, 1, 1 ] ),
 					modelRoot.getNodeByPath( [ 0, 2, 2 ] )
 				);
@@ -327,7 +326,7 @@ describe( 'RemoveColumnCommand', () => {
 
 				const tableSelection = editor.plugins.get( TableSelection );
 				const modelRoot = model.document.getRoot();
-				tableSelection._setCellSelection(
+				tableSelection.setCellSelection(
 					modelRoot.getNodeByPath( [ 0, 0, 1 ] ),
 					modelRoot.getNodeByPath( [ 0, 1, 3 ] )
 				);
@@ -349,7 +348,7 @@ describe( 'RemoveColumnCommand', () => {
 
 				const tableSelection = editor.plugins.get( TableSelection );
 				const modelRoot = model.document.getRoot();
-				tableSelection._setCellSelection(
+				tableSelection.setCellSelection(
 					modelRoot.getNodeByPath( [ 0, 0, 0 ] ),
 					modelRoot.getNodeByPath( [ 0, 1, 1 ] )
 				);
