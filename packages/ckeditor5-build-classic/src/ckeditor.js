@@ -183,7 +183,9 @@ ClassicEditor.colloborationPlugins = [
 	SbpAuthorsNoteBox,
 	Handlebars,
 	SbpAutoformat,
-	ReactPluginEditing
+	ReactPluginEditing,
+	ExportPdf,
+	ExportWord
 ];
 
 ClassicEditor.collaborationToolbar = {
@@ -225,6 +227,8 @@ ClassicEditor.collaborationToolbar = {
 			'sbpAuthorsNoteBox',
 			'comment',
 			'|',
+			'exportPdf',
+			'exportWord',
 			'trackChanges'
 		],
 		shouldNotGroupWhenFull: true
@@ -352,23 +356,6 @@ ClassicEditor.defaultConfig = {
 			borderColors: customBorderColorPalette,
 			backgroundColors: customBackgroundColorPalette
 		}
-	},
-	exportPdf: {
-		stylesheets: [
-			'EDITOR_STYLES',
-		],
-		fileName: 'my-file.pdf',
-		converterOptions: {
-			format: 'A4',
-			margin_top: '20mm',
-			margin_bottom: '20mm',
-			margin_right: '12mm',
-			margin_left: '12mm',
-			page_orientation: 'portrait'
-		}
-	},
-	exportWord: {
-		fileName: 'my-file.docx'
 	},
 	// This value must be kept in sync with the language defined in webpack.config.js.
 	language: 'en'
